@@ -33,7 +33,7 @@ let lexer = LexerBuilder::from_names(HashMap::new([
     .add_pattern(Char('+'), |_x| ExpressionToken::Plus)
     .add_pattern(Char('-'), |_x| ExpressionToken::Minus)
     .add_pattern(Char('*'), |_x| ExpressionToken::Times)
-    .add_pattern(Str("rlex!", |_x| {println!("It feels good to rlex sometimes!") ; ExpressionToken::Empty}))
+    .add_pattern(Str("rlex!", |_x| {println!("It feels good to rlex sometimes!") ; ExpressionToken::Blank}))
     .add_pattern(Char('/'), |_x| ExpressionToken::Div)
 
 .build();
