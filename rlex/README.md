@@ -38,7 +38,7 @@ let lexer = LexerBuilder::from_names(HashMap::new([
 
 .build();
 
-let text = "x + y * 2 relax"
+let text = "x + y * 2 rlex!"
 
 for lexeme in lexer.lexemes(text) {
     
@@ -60,6 +60,7 @@ Blank
 Times
 Blank
 Val(2)
+Blank
 It feels good to rlex sometimes!
 Blank
 ```
