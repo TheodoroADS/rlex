@@ -22,9 +22,9 @@ enum ExpressionToken {
 }
 
 let lexer = LexerBuilder::from_names(HashMap::new([
-    ("whitespace" , Set(HashSet::from([' ', '\n' , '\t' , '\r'])))
-    ("letters", Star(Box::new(Or(Box::new(Range('a','z'))), Box::new(Range('A','Z')))))
-    ("digits", Star(Box::new(Range('0','9'))))
+    ("whitespace" , Set!{' ', '\n' , '\t' , '\r'})
+    ("letters", Star!(Or!(Range('a','z'), Range('A','Z'))))
+    ("digits", Star!(Range('0','9')))
 ]))
     .add_pattern(Name("whitespace"), |_x| ExpressionToken::Blank)
     .add_pattern(Name("letters"), |x| ExpressionToken::Var(x))
