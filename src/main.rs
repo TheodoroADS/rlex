@@ -50,17 +50,17 @@ fn main() {
 
     let lex = LexerBuilder::from_names(
         HashMap::from([
-            ("whitespace", Set(HashSet::from([' ','\t','\n', '\r']))),
+            ("whitespace", Set!{' ','\t','\n', '\r'}),
             ("lower", Range('a','z')),
             ("upper", Range('A','Z')),
-            ("letter", Or(Box::new(Name("lower")) , Box::new(Name("upper")))),
-            ("letters", Plus(Box::new(Name("letter")))),
+            ("letter", Or!(Name("lower") ,Name("upper"))),
+            ("letters", Plus!(Name("letter"))),
             ("digit", Range('0','9')),
-            ("digits", Star(Box::new(Name("digit")))),
+            ("digits", Star!(Name("digit"))),
             ("letters_digits_symbols", Range(33 as char , 126 as char)),
             ("any", Range(0 as char , 126 as char)),
-            ("letter_or_underscore", Or(Box::new(Name("letter")), Box::new(Char('_')))),
-            ("valid_identifier", Seqn(Box::new(Name("letter_or_underscore")), Box::new(Star(Box::new(Or(Box::new(Name("digit")), Box::new(Name("letter_or_underscore"))))))))
+            ("letter_or_underscore", Or!(Name("letter"),Char('_'))),
+            ("valid_identifier", Seqn!(Name("letter_or_underscore"),Star!(Or!(Name("digit"), Name("letter_or_underscore")))))
         ])
     )
         .add_pattern(Name("whitespace"), |_x| PythonToken::Empty)
@@ -144,13 +144,13 @@ fn main() {
         .add_pattern(Char('&'), |_x| PythonToken::Ampersand)
         .add_pattern(Str("<>"), |_x| PythonToken::Diamond)
         .add_pattern(Name("digits"), |x| PythonToken::IntLiteral(x.parse::<i32>().unwrap()))
-        .add_pattern(Seqn(Box::new(Star(Box::new(Name("digit")))), Box::new(Seqn(Box::new(Char('.')), Box::new(Star(Box::new(Name("digit"))))))), |x| PythonToken::FloatLiteral(x.parse::<f32>().unwrap()))
-        .add_pattern(Seqn(Box::new(Char('"')), Box::new(Seqn( Box::new(Star(Box::new(Regex::all_except(HashSet::from(['"']))))), Box::new(Char('"'))))),|x| PythonToken::StrLiteral(x))
-        .add_pattern(Seqn(Box::new(Char('\'')), Box::new(Seqn( Box::new(Star(Box::new(Regex::all_except(HashSet::from(['\'']))))), Box::new(Char('\''))))),|x| PythonToken::StrLiteral(x))
-        .add_pattern(Seqn(Box::new(Str("'''")), Box::new(Seqn( Box::new(Star(Box::new(Name("any")))), Box::new(Str("'''"))))),|x| PythonToken::StrLiteral(x))
-        .add_pattern(Seqn(Box::new(Str("\"\"\"")), Box::new(Seqn( Box::new(Star(Box::new(Name("any")))), Box::new(Str("\"\"\""))))),|x| PythonToken::StrLiteral(x))
+        .add_pattern(Seqn!(Star!(Name("digit")), Seqn!(Char('.'), Star!(Name("digit")))), |x| PythonToken::FloatLiteral(x.parse::<f32>().unwrap()))
+        .add_pattern(Seqn!(Char('"'), Seqn!(Star!(Regex::all_except(HashSet::from(['"']))), Char('"'))),|x| PythonToken::StrLiteral(x))
+        .add_pattern(Seqn!(Char('\''), Seqn!( Star!(Regex::all_except(HashSet::from(['\'']))), Char('\''))),|x| PythonToken::StrLiteral(x))
+        .add_pattern(Seqn!(Str("'''"), Seqn!(Star!(Name("any")), Str("'''"))),|x| PythonToken::StrLiteral(x))
+        .add_pattern(Seqn!(Str("\"\"\""), Seqn!(Star!(Name("any")), Str("\"\"\""))),|x| PythonToken::StrLiteral(x))
         .add_pattern(Name("valid_identifier"), |x| PythonToken::Identifier(x)) 
-        .add_pattern(Seqn(Box::new(Char('#')) , Box::new(Seqn(Box::new(Star(Box::new(Regex::all_except(HashSet::from(['\n','\r']))))), Box::new(Set(HashSet::from(['\n','\r'])))))), |x| PythonToken::Comment(x))
+        .add_pattern(Seqn!(Char('#'), Seqn!( Star!(Regex::all_except(HashSet::from(['\n','\r']))), Set!{'\n','\r'})), |x| PythonToken::Comment(x))
 
     .build();
 
@@ -159,21 +159,22 @@ fn main() {
         
         let binding = fs::read_to_string(file_path.clone())
         .expect(format!("Could not open file {}" , file_path).as_str());
-    
-    let text = binding.as_str();    
-    
-    println!("File contents : \n {}", text);
-    
-    
-    lex.lexemes(text)
-    .filter(|x| {
-        if let Ok(tok) = x {
-                *tok != PythonToken::Empty
-            }else {
-                true
-            }
-        })
-        .for_each(|x| println!("{:?}", x));
-    
-}
+        
+        let text = binding.as_str();    
+        
+        println!("File contents : \n {}", text);
+        
+        
+        lex.lexemes(text)
+        .filter(|x| {
+            if let Ok(tok) = x {
+                    *tok != PythonToken::Empty
+                }else {
+                    true
+                }
+            })
+            .for_each(|x| println!("{:?}", x));
+    }
+
+
 }

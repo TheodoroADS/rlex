@@ -230,34 +230,44 @@ impl Regex {
 }
 
 
+#[macro_export]
+macro_rules! Star {
+    ($reg:expr) => {
+        Star(Box::new($reg))
+    };
+}
 
 #[macro_export]
-macro_rules! regex {
-    
-    (*($reg:expr)) => {
-        Star(Box::new(regex!($reg)))
+macro_rules! Plus {
+    ($reg:expr) => {
+        Plus(Box::new($reg))
     };
+}
 
-    (+($reg:expr)) => {
-        Plust(Box::new(regex!($reg)))
+#[macro_export]
+macro_rules! Optional {
+    ($reg:expr) => {
+        Optional(Box::new($reg))
     };
-    
-    (?($reg:expr)) => {
-        Optional(Box::new(regex!($reg)))
-    };
+}
 
-    (Or($reg1:expr , $reg2:expr )) => {
-        Or(Box::new(regex!($reg1)) , Box::new(regex!($reg2)))
+#[macro_export]
+macro_rules! Or {
+    ($reg1:expr , $reg2:expr) => {
+        Or(Box::new($reg1), Box::new($reg2))
     };
+}
 
-    (Seqn($reg1:expr , $reg2:expr )) => {
-        Seqn(Box::new(regex!($reg1)) , Box::new(regex!($reg2)))
+#[macro_export]
+macro_rules! Seqn {
+    ($reg1:expr , $reg2:expr) => {
+        Seqn(Box::new($reg1), Box::new($reg2))
     };
+}
 
-    (Set($($v:expr),* $(,)?)) => {
+#[macro_export]
+macro_rules! Set {
+    ($($v:expr),* $(,)?) => {
         Set(HashSet::from([$($v,)*]))
     };
-
-    ($x:expr) => {$x}
-    
 }
